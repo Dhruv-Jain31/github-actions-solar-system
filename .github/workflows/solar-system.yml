@@ -24,7 +24,22 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: 20
-    
+
+        - name: Cache NPM dependencies
+          uses: actions/cache@v4
+          with:
+            # Path to cache → this is where npm stores downloaded packages
+            path: ~/.npm
+
+            # Cache key (unique identifier for cache entries)
+            # Format breakdown:
+            # 1. runner.os → ensures cache is specific to OS (Linux/Windows/macOS)
+            # 2. "node-modules" → just a human-readable tag
+            # 3. hashFiles('package-lock.json') → generates a unique hash based on package-lock.json
+            #    → if dependencies change, this hash changes → cache invalidates → new cache created
+            #    → if no change, the same cache is reused → saves build time
+            key: "${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}"
+
         - name: Install Dependencies
           run: npm install
     
